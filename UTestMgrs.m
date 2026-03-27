@@ -37,6 +37,22 @@ classdef UTestMgrs < matlab.unittest.TestCase
             end
         end
 
+        function testUtmArrayToStrings(testCase)
+            testData = testCase.testCoordinates;
+            sizeTestData = size(testData);
+            testUtmArray = mgrs.UTM.fromLatLon([testData.lat], [testData.lon]);
+            testCase.verifySize( testUtmArray, sizeTestData, ...
+                'mgrs.UTM.fromLatLon returned a UTM array of the wrong size.' )
+
+            testCase.verifyClass( string(testUtmArray), 'string', ...
+                'mgrs.UTM.fromLatLon did not return a string array when cast to string.' )
+            testCase.verifySize( string(testUtmArray), sizeTestData, ...
+                'mgrs.UTM.fromLatLon did not return a string array of the correct size')
+
+            testCase.verifyTrue( iscellstr(cellstr(testUtmArray)), ...
+                'mgrs.UTM.cellstr did not return a cell array of character vectors.')
+        end
+
         function testGetBandLetter(testCase)
             testData = testCase.testLatitudeBands;
             for ii = 1:numel(testData)

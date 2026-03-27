@@ -27,12 +27,28 @@ classdef UTM
         end
 
         function utmString = string(obj)
-            utmString = compose("%02d", obj.zone) ...
-                + getInitial(obj.hemisphere) ...
-                + " " ...
-                + compose("%06.0f", obj.easting) ...
-                + " " ...
-                + compose("%07.0f", obj.northing);
+            if coder.target("MATLAB")
+                utmString = strings(size(obj));
+                for ii = 1:numel(obj)
+                    utmString(ii) = sprintf("%02d", obj(ii).zone) ...
+                        + getInitial(obj(ii).hemisphere) ...
+                        + " " ...
+                        + sprintf("%06.0f", obj(ii).easting) ...
+                        + " " ...
+                        + sprintf("%07.0f", obj(ii).northing);
+                end
+            else
+                utmString = sprintf("%02d", obj.zone) ...
+                    + getInitial(obj.hemisphere) ...
+                    + " " ...
+                    + sprintf("%06.0f", obj.easting) ...
+                    + " " ...
+                    + sprintf("%07.0f", obj.northing);
+            end
+        end
+
+        function utmChar = cellstr(obj)
+            utmChar = cellstr(string(obj));
         end
 
         function utmChar = char(obj)
@@ -56,12 +72,53 @@ classdef UTM
     methods ( Static )
 
         function obj = fromLatLon(latitude_deg, longitude_deg)
+
+            arguments
+                latitude_deg double {mustBeVector}
+                longitude_deg double {mustBeVector}
+            end
+
+            if coder.target("MATLAB")
+                % Assert that latitude_deg and longitude_deg must be the same length.
+                assert( numel(latitude_deg) == numel(longitude_deg), ...
+                    'MGRS:inputsDifferentSizes', ...
+                    'The inputs latitude_deg and longitude_deg must be vectors of the same length.' )
+
+                % Allocate UTM object array
+                if verLessThan('matlab','24.2') %#ok<VERLESSMATLAB>
+                    % This fixes a code generation check in R2024b.
+                    obj = createArray(size(latitude_deg),'mgrs.UTM');
+                else
+                    % This is needed for older MATLAB, because createArray
+                    % was added in R2024b.
+                    latSize = size(latitude_deg);
+                    obj(latSize(1),latSize(2)) = mgrs.UTM();
+                end
+
+                for ii = 1:numel(obj)
+                    utmParameters = mgrs.UTM.latlon2utm(latitude_deg(ii), longitude_deg(ii));
+                    obj(ii) = mgrs.UTM(utmParameters{:});
+                end
+            else
+                assert( isscalar(latitude_deg) && isscalar(longitude_deg))
+
+                utmParameters = mgrs.UTM.latlon2utm(latitude_deg, longitude_deg);
+                obj = mgrs.UTM(utmParameters{:});
+            end
+        end
+
+    end
+
+    methods ( Static, Access = private )
+
+        function utmParameters = latlon2utm(latitude_deg, longitude_deg)
+
             zone = double(mgrs.gridZone.getZoneNumber(latitude_deg, longitude_deg));
 
             hemisphere = mgrs.Hemisphere.fromLatitude(latitude_deg);
 
+            % Adapted from NGA MGRS Java library https://github.com/ngageoint/mgrs-java
             easting = 0.5 * log( (1 + cos(latitude_deg * pi/180) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180)) / (1 - cos( latitude_deg * pi/180 ) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180 )) ) * 0.9996 * 6399593.62 / sqrt( (1 + (0.0820944379)^2 * (cos( latitude_deg * pi/180 ))^2) ) * (1 + (0.0820944379)^2 / 2 * ((0.5 * log( (1 + cos( latitude_deg * pi/180 ) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180 )) / (1 - cos( latitude_deg * pi/180 ) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180 )) )))^2 * (cos( latitude_deg * pi/180 ))^2 / 3) + 500000;
-
             northing = (atan( tan( latitude_deg * pi/180 ) / cos( (longitude_deg * pi/180 - (6 * zone -183) * pi/180) ) ) - latitude_deg * pi/180) * 0.9996 * 6399593.625 / sqrt( 1 + 0.006739496742 * (cos( latitude_deg * pi/180 ))^2 ) * (1 + 0.006739496742 / 2 * (0.5 * log( (1 + cos( latitude_deg * pi/180) * sin( (longitude_deg * pi/180 - (6 * zone - 183) * pi/180) )) / (1 - cos( latitude_deg * pi/180) * sin( (longitude_deg * pi/180 - (6 * zone - 183) * pi/180) )) ))^2 * (cos( latitude_deg * pi/180 ))^2) + 0.9996 * 6399593.625 * (latitude_deg * pi/180 - 0.005054622556 * (latitude_deg * pi/180 + sin( 2 * latitude_deg * pi/180 ) / 2) + 4.258201531e-05 * (3 * (latitude_deg * pi/180 + sin( 2 * latitude_deg * pi/180 ) / 2) + sin( 2 * latitude_deg * pi/180 ) * (cos( latitude_deg * pi/180 ))^2) / 4 - 1.674057895e-07 * (5 * (3 * (latitude_deg * pi/180 + sin( 2 * latitude_deg * pi/180 ) / 2) + sin( 2 * latitude_deg * pi/180 ) * (cos( latitude_deg * pi/180 ))^2) / 4 + sin( 2 * latitude_deg * pi/180 ) * (cos( latitude_deg * pi/180 ))^2 * (cos( latitude_deg * pi/180 ))^2) / 3);
 
             if hemisphere == mgrs.Hemisphere.South
@@ -71,9 +128,11 @@ classdef UTM
             % Truncate to the South West corner of the 1 meter square.
             easting = floor(easting);
             northing = floor(northing);
-            
-            obj = mgrs.UTM(zone, hemisphere, easting, northing);
+
+            utmParameters = {zone, hemisphere, easting, northing};
+                
         end
 
     end
+
 end
