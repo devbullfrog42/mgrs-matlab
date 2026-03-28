@@ -92,13 +92,13 @@ classdef UTM
 
                 % Allocate UTM object array
                 if verLessThan('matlab','24.2') %#ok<VERLESSMATLAB>
-                    % This fixes a code generation check in R2024b.
-                    obj = createArray(size(latitude_deg),'mgrs.UTM');
-                else
                     % This is needed for older MATLAB, because createArray
                     % was added in R2024b.
                     latSize = size(latitude_deg);
                     obj(latSize(1),latSize(2)) = mgrs.UTM();
+                else
+                    % This fixes a code generation check in R2024b.
+                    obj = createArray(size(latitude_deg),'mgrs.UTM');
                 end
 
                 for ii = 1:numel(obj)
@@ -120,9 +120,20 @@ classdef UTM
             end
 
             if coder.target("MATLAB")
+                if verLessThan('matlab', '24.2') %#ok<VERLESSMATLAB>
+                    utmSize = size(utmString);
+                    obj(utmSize(1),utmSize(2)) = mgrs.UTM();
+                else
+                    obj = createArray(size(utmString), 'mgrs.UTM');
+                end
 
+                for ii = 1:numel(utmString)
+                    [zone, hemisphere, easting, northing] = mgrs.internal.extractUtmFromString(utmString(ii));
+                    obj(ii) = mgrs.UTM(zone, hemisphere, easting, northing);
+                end
             else
-
+                [zone, hemisphere, easting, northing] = mgrs.internal.extractUtmFromString(utmString(ii));
+                obj = mgrs.UTM(zone, hemisphere, easting, northing);
             end
 
         end
@@ -133,7 +144,7 @@ end
 
 function mustBeUtmString(utmString)
     bool = ~mgrs.isUtmString(utmString);
-    if any(~bool)
+    if any(bool)
         [badr, badc] = ind2sub(size(bool), find(bool));
         badList = string();
         for ii = 1:numel(badr)
