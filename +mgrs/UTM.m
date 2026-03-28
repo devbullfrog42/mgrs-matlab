@@ -56,15 +56,21 @@ classdef UTM
         end
 
         function [latitude_deg, longitude_deg] = toLatLon(obj)
-            north = obj.northing;
-            if obj.hemisphere == mgrs.Hemisphere.South
-                north = north - 10000000;
-            end
-            east = obj.easting;
 
-            % Adapted from NGA MGRS Java library https://github.com/ngageoint/mgrs-java
-            latitude_deg = (north / 6366197.724 / 0.9996 + (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2 - 0.006739496742 * sin( north / 6366197.724 / 0.9996 ) * cos( north / 6366197.724 / 0.9996 ) * (atan( cos( atan( (exp( (east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2 / 3) ) - exp( -(east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2 / 3) )) / 2 / cos( (north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + sin( 2 * north /6366197.724 / 0.9996 ) / 2) + (0.006739496742 * 3 / 4)^2 * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 - (0.006739496742 * 3 / 4)^3 * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2 * (cos( north / 6366197.724 / 0.9996 ))^2) / 3)) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2) + north / 6366197.724 / 0.9996 ) ) ) * tan( (north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + (0.006739496742 * 3 / 4)^2 * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 - (0.006739496742 * 3 / 4)^3 * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2 * (cos( north / 6366197.724 / 0.9996 ))^2) / 3)) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2) + north / 6366197.724 / 0.9996 ) ) - north / 6366197.724 / 0.9996) * 3 / 2) * (atan( cos( atan( (exp( (east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2 / 3) ) - exp( -(east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2 / 3) )) / 2 / cos( (north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + (0.006739496742 * 3 / 4)^2 * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 - (0.006739496742 * 3 / 4)^3 * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2 * (cos( north / 6366197.724 / 0.9996 ))^2) / 3)) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2) + north / 6366197.724 / 0.9996 ) ) ) * tan( (north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + (0.006739496742 * 3 / 4)^2 * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 - (0.006739496742 * 3 / 4)^3 * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2 * (cos( north / 6366197.724 / 0.9996 ))^2) / 3)) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2) + north / 6366197.724 / 0.9996 ) ) - north / 6366197.724 / 0.9996)) * 180/pi();
-            longitude_deg = atan( (exp( (east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2 / 3) ) - exp( -(east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2 / 3) )) / 2 / cos( (north - 0.9996 * 6399593.625 * (north / 6366197.724 / 0.9996 - 0.006739496742 * 3 / 4 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + (0.006739496742 * 3 / 4)^2 * 5 / 3 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 - (0.006739496742 * 3 / 4)^3 * 35 / 27 * (5 * (3 * (north / 6366197.724 / 0.9996 + sin( 2 * north / 6366197.724 / 0.9996 ) / 2) + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2) / 4 + sin( 2 * north / 6366197.724 / 0.9996 ) * (cos( north / 6366197.724 / 0.9996 ))^2 * (cos( north / 6366197.724 / 0.9996 ))^2) / 3)) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )) * (1 - 0.006739496742 * ((east - 500000) / (0.9996 * 6399593.625 / sqrt( (1 + 0.006739496742 * (cos( north / 6366197.724 / 0.9996 ))^2) )))^2 / 2 * (cos( north / 6366197.724 / 0.9996 ))^2) + north / 6366197.724 / 0.9996 ) ) * 180/pi()+double(obj.zone)*6-183;
+            if coder.target("MATLAB")
+                % Allocate latitude and longitude.
+                latitude_deg = zeros(size(obj));
+                longitude_deg = zeros(size(obj));
+
+                for ii = 1:numel(size(obj))
+                    [latitude_deg(ii), longitude_deg(ii)] = mgrs.internal.utmToLatLon( ...
+                        obj(ii).zone, obj(ii).hemisphere, obj(ii).easting, obj(ii).northing );
+                end
+            else
+                [latitude_deg, longitude_deg] = mgrs.internal.utmToLatLon( ...
+                    obj.zone, obj.hemisphere, obj.easting, obj.northing );
+            end
+
         end
 
     end
@@ -96,13 +102,13 @@ classdef UTM
                 end
 
                 for ii = 1:numel(obj)
-                    utmParameters = mgrs.UTM.latlon2utm(latitude_deg(ii), longitude_deg(ii));
+                    utmParameters = mgrs.internal.latLonToUtm(latitude_deg(ii), longitude_deg(ii));
                     obj(ii) = mgrs.UTM(utmParameters{:});
                 end
             else
                 assert( isscalar(latitude_deg) && isscalar(longitude_deg))
 
-                utmParameters = mgrs.UTM.latlon2utm(latitude_deg, longitude_deg);
+                utmParameters = mgrs.internal.latLonToUtm(latitude_deg, longitude_deg);
                 obj = mgrs.UTM(utmParameters{:});
             end
         end
@@ -113,31 +119,12 @@ classdef UTM
                 utmString string {mustBeUtmString}
             end
 
-        end
-    end
+            if coder.target("MATLAB")
 
-    methods ( Static, Access = private )
+            else
 
-        function utmParameters = latlon2utm(latitude_deg, longitude_deg)
-
-            zone = double(mgrs.gridZone.getZoneNumber(latitude_deg, longitude_deg));
-
-            hemisphere = mgrs.Hemisphere.fromLatitude(latitude_deg);
-
-            % Adapted from NGA MGRS Java library https://github.com/ngageoint/mgrs-java
-            easting = 0.5 * log( (1 + cos(latitude_deg * pi/180) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180)) / (1 - cos( latitude_deg * pi/180 ) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180 )) ) * 0.9996 * 6399593.62 / sqrt( (1 + (0.0820944379)^2 * (cos( latitude_deg * pi/180 ))^2) ) * (1 + (0.0820944379)^2 / 2 * ((0.5 * log( (1 + cos( latitude_deg * pi/180 ) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180 )) / (1 - cos( latitude_deg * pi/180 ) * sin( longitude_deg * pi/180 - (6 * zone - 183) * pi/180 )) )))^2 * (cos( latitude_deg * pi/180 ))^2 / 3) + 500000;
-            northing = (atan( tan( latitude_deg * pi/180 ) / cos( (longitude_deg * pi/180 - (6 * zone -183) * pi/180) ) ) - latitude_deg * pi/180) * 0.9996 * 6399593.625 / sqrt( 1 + 0.006739496742 * (cos( latitude_deg * pi/180 ))^2 ) * (1 + 0.006739496742 / 2 * (0.5 * log( (1 + cos( latitude_deg * pi/180) * sin( (longitude_deg * pi/180 - (6 * zone - 183) * pi/180) )) / (1 - cos( latitude_deg * pi/180) * sin( (longitude_deg * pi/180 - (6 * zone - 183) * pi/180) )) ))^2 * (cos( latitude_deg * pi/180 ))^2) + 0.9996 * 6399593.625 * (latitude_deg * pi/180 - 0.005054622556 * (latitude_deg * pi/180 + sin( 2 * latitude_deg * pi/180 ) / 2) + 4.258201531e-05 * (3 * (latitude_deg * pi/180 + sin( 2 * latitude_deg * pi/180 ) / 2) + sin( 2 * latitude_deg * pi/180 ) * (cos( latitude_deg * pi/180 ))^2) / 4 - 1.674057895e-07 * (5 * (3 * (latitude_deg * pi/180 + sin( 2 * latitude_deg * pi/180 ) / 2) + sin( 2 * latitude_deg * pi/180 ) * (cos( latitude_deg * pi/180 ))^2) / 4 + sin( 2 * latitude_deg * pi/180 ) * (cos( latitude_deg * pi/180 ))^2 * (cos( latitude_deg * pi/180 ))^2) / 3);
-
-            if hemisphere == mgrs.Hemisphere.South
-                northing = northing + 10000000;
             end
 
-            % Truncate to the South West corner of the 1 meter square.
-            easting = floor(easting);
-            northing = floor(northing);
-
-            utmParameters = {zone, hemisphere, easting, northing};
-                
         end
 
     end
