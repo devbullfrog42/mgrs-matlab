@@ -5,7 +5,7 @@ function [zone, hemisphere, easting, northing] = extractUtmFromString(utmString)
     end
 
     % Erase all spaces
-    utmString = erase(utmString, " ");
+    utmString = erase(utmString, ' ');
 
     % Find the hemisphere letter.
     letterPosition = find(isletter(utmString));
@@ -15,7 +15,8 @@ function [zone, hemisphere, easting, northing] = extractUtmFromString(utmString)
     zone = uint8(str2double(zoneStr));
 
     % Get the hemisphere.
-    if matches(extract(utmString, letterPosition), "N", "IgnoreCase", true)
+    utmChar = char(utmString);
+    if matches(utmChar(letterPosition), 'N', 'IgnoreCase', true)
         hemisphere = mgrs.Hemisphere.North;
     else
         hemisphere = mgrs.Hemisphere.South;
