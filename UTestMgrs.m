@@ -66,29 +66,35 @@ classdef UTestMgrs < matlab.unittest.TestCase
             testLongitudes_deg = [testData.lon]';
             testUtmStr = [testData.utm]';
             testUtmCoords = mgrs.UTM.fromUtmString(testUtmStr);
-            [latBounds, lonBounds] = testUtmCoords.getLatLonBounds();
-            latInBounds = latBounds(:,1) <= testLatitudes_deg & testLatitudes_deg < latBounds(:,2);
-            lonInBounds = lonBounds(:,1) <= testLongitudes_deg & testLongitudes_deg < lonBounds(:,2);
 
-            if any(~latInBounds)
-                latOutOfBoundsStr = compose("(%d) %s", find(~latInBounds), testUtmStr(~latInBounds));
+            % Get the coordinate corners in latitude & longitude.
+            testCoordsSW = testUtmCoords.toLatLonPair("southwest");
+            testCoordsNE = testUtmCoords.toLatLonPair("northeast");
+            testCoordsCenter = testUtmCoords.toLatLonPair("center");
+
+            % Calc the angular distance of the corners from the center.
+            swDistance = vecnorm(testCoordsSW - testCoordsCenter, 2, 2);
+            neDistance = vecnorm(testCoordsNE - testCoordsCenter, 2, 2);
+            maxDistance = max(swDistance, neDistance);
+
+            % Calc the angular distance from the center to the given
+            % latitude and longitude.
+            testLatLon = [testLatitudes_deg testLongitudes_deg];
+            distance = vecnorm(testLatLon - testCoordsCenter, 2, 2);
+
+            % Check if any distances are greater than the max.
+            distanceInBound = distance < maxDistance;
+
+            % If any distances are out of bounds, fail the test.
+            if any(~distanceInBound)
+                distanceOutOfBoundsStr = compose("(%d) %s", find(~distanceInBound), testUtmStr(~distanceInBound));
             else
-                latOutOfBoundsStr = "";
+                distanceOutOfBoundsStr = "";
             end
 
-            testCase.verifyTrue( all(latInBounds), ...
-                sprintf( "The following test UTM coordinates where out of bounds in latitude:\n%s\n", ...
-                join(latOutOfBoundsStr, newline) ) )
-
-            if any(~lonInBounds)
-                lonOutOfBoundsStr = compose("(%d) %s", find(~lonInBounds), testUtmStr(~lonInBounds));
-            else
-                lonOutOfBoundsStr = "";
-            end
-
-            testCase.verifyTrue( all(lonInBounds), ...
-                sprintf( "The following test UTM coordinates where out of bounds in longitude:\n%s\n", ...
-                join(lonOutOfBoundsStr, newline) ) )
+            testCase.verifyTrue( all(distanceInBound), ...
+                sprintf( "The following test latitude & longitude coordinates where out of bounds of their UTM 1x1 m square:\n%s\n", ...
+                join(distanceOutOfBoundsStr, newline) ) )
         end
 
         function testUtmArrayToStrings(testCase)
