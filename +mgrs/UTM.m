@@ -62,7 +62,7 @@ classdef UTM
                 latitude_deg = zeros(size(obj));
                 longitude_deg = zeros(size(obj));
 
-                for ii = 1:numel(size(obj))
+                for ii = 1:numel(obj)
                     [latitude_deg(ii), longitude_deg(ii)] = mgrs.internal.utmToLatLon( ...
                         obj(ii).zone, obj(ii).hemisphere, obj(ii).easting, obj(ii).northing );
                 end
