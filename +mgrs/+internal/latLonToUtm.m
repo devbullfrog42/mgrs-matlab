@@ -1,4 +1,4 @@
-function utmParameters = latLonToUtm(latitude_deg, longitude_deg)
+function [zone, hemisphere, easting, northing] = latLonToUtm(latitude_deg, longitude_deg)
     % mgrs.internal.latLonToUtm converts latitude and longitude to UTM coordinate parameters
     % Adapted from NGA MGRS Java library https://github.com/ngageoint/mgrs-java
 
@@ -16,7 +16,5 @@ function utmParameters = latLonToUtm(latitude_deg, longitude_deg)
     % Truncate to the South West corner of the 1 meter square.
     easting = floor(easting);
     northing = floor(northing);
-
-    utmParameters = {zone, hemisphere, easting, northing};
 
 end

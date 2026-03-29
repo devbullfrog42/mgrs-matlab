@@ -152,14 +152,14 @@ classdef UTM
                 end
 
                 for ii = 1:numel(obj)
-                    utmParameters = mgrs.internal.latLonToUtm(latitude_deg(ii), longitude_deg(ii));
-                    obj(ii) = mgrs.UTM(utmParameters{:});
+                    [zone, hemisphere, easting, northing] = mgrs.internal.latLonToUtm(latitude_deg(ii), longitude_deg(ii));
+                    obj(ii) = mgrs.UTM(zone, hemisphere, easting, northing);
                 end
             else
                 assert( isscalar(latitude_deg) && isscalar(longitude_deg))
 
-                utmParameters = mgrs.internal.latLonToUtm(latitude_deg, longitude_deg);
-                obj = mgrs.UTM(utmParameters{:});
+                [zone, hemisphere, easting, northing] = mgrs.internal.latLonToUtm(latitude_deg, longitude_deg);
+                obj = mgrs.UTM(zone, hemisphere, easting, northing);
             end
         end
 
