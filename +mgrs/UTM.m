@@ -73,6 +73,34 @@ classdef UTM
 
         end
 
+        function latitudeLongitudePair_deg = toLatLonPair(obj)
+            [latitude_deg, longitude_deg] = obj.toLatLon();
+            latitudeLongitudePair_deg = [latitude_deg(:) longitude_deg(:)];
+        end
+
+        function [latitudeBounds_deg, longitudeBounds_deg] = getLatLonBounds(obj)
+
+            % Create the UTM coordinate of the North East corner of the 1x1 m square.
+            objNE = obj;
+            if coder.target("MATLAB")
+                for ii = 1:numel(objNE)
+                    objNE(ii).easting = objNE(ii).easting + 1;
+                    objNE(ii).northing = objNE(ii).northing + 1;
+                end
+            else
+                objNE.easting = objNE.easting + 1;
+                objNE.northing = objNE.northing + 1;
+            end
+
+            % Convert to latitude and longitude.
+            [latSW, lonSW] = obj.toLatLon();
+            [latNE, lonNE] = objNE.toLatLon();
+
+            % Output the latitude and longitude bounds.
+            latitudeBounds_deg = [latSW(:) latNE(:)];
+            longitudeBounds_deg = [lonSW(:) lonNE(:)];
+        end
+
     end
 
     methods ( Static )
@@ -111,6 +139,19 @@ classdef UTM
                 utmParameters = mgrs.internal.latLonToUtm(latitude_deg, longitude_deg);
                 obj = mgrs.UTM(utmParameters{:});
             end
+        end
+
+        function obj = fromLatLonPair(latitudeLongitudePair_deg)
+
+            arguments
+                latitudeLongitudePair_deg (2,:) double
+            end
+
+            latitude_deg = latitudeLongitudePair_deg(:,1);
+            longitude_deg = latitudeLongitudePair_deg(:,2);
+
+            obj = mgrs.UTM.fromLatLon(latitude_deg, longitude_deg);
+
         end
 
         function obj = fromUtmString(utmString)
