@@ -132,7 +132,7 @@ classdef UTM
                     obj(ii) = mgrs.UTM(zone, hemisphere, easting, northing);
                 end
             else
-                [zone, hemisphere, easting, northing] = mgrs.internal.extractUtmFromString(utmString(ii));
+                [zone, hemisphere, easting, northing] = mgrs.internal.extractUtmFromString(utmString);
                 obj = mgrs.UTM(zone, hemisphere, easting, northing);
             end
 
