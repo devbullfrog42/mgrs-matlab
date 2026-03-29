@@ -60,6 +60,37 @@ classdef UTestMgrs < matlab.unittest.TestCase
             end
         end
 
+        function testUtmCoordinatesContainLatLon(testCase)
+            testData = testCase.testCoordinates;
+            testLatitudes_deg = [testData.lat]';
+            testLongitudes_deg = [testData.lon]';
+            testUtmStr = [testData.utm]';
+            testUtmCoords = mgrs.UTM.fromUtmString(testUtmStr);
+            [latBounds, lonBounds] = testUtmCoords.getLatLonBounds();
+            latInBounds = latBounds(:,1) <= testLatitudes_deg & testLatitudes_deg < latBounds(:,2);
+            lonInBounds = lonBounds(:,1) <= testLongitudes_deg & testLongitudes_deg < lonBounds(:,2);
+
+            if any(~latInBounds)
+                latOutOfBoundsStr = compose("(%d) %s", find(~latInBounds), testUtmStr(~latInBounds));
+            else
+                latOutOfBoundsStr = "";
+            end
+
+            testCase.verifyTrue( all(latInBounds), ...
+                sprintf( "The following test UTM coordinates where out of bounds in latitude:\n%s\n", ...
+                join(latOutOfBoundsStr, newline) ) )
+
+            if any(~lonInBounds)
+                lonOutOfBoundsStr = compose("(%d) %s", find(~lonInBounds), testUtmStr(~lonInBounds));
+            else
+                lonOutOfBoundsStr = "";
+            end
+
+            testCase.verifyTrue( all(lonInBounds), ...
+                sprintf( "The following test UTM coordinates where out of bounds in longitude:\n%s\n", ...
+                join(lonOutOfBoundsStr, newline) ) )
+        end
+
         function testUtmArrayToStrings(testCase)
             testData = testCase.testCoordinates;
             sizeTestData = size(testData);
