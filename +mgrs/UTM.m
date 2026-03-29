@@ -64,12 +64,21 @@ classdef UTM
 
             % Defined the easting & northing shift for the returned
             % latitude and longitude.
-            if gridPoint == mgrs.GridPoint.center
-                eastingShift = 0.5;
-                northingShift = 0.5;
-            else
+            if gridPoint == mgrs.GridPoint.southwest
                 eastingShift = 0.0;
                 northingShift = 0.0;
+            elseif gridPoint == mgrs.GridPoint.northwest
+                eastingShift = 0.0;
+                northingShift = 1.0;
+            elseif gridPoint == mgrs.GridPoint.northeast
+                eastingShift = 1.0;
+                northingShift = 1.0;
+            elseif gridPoint == mgrs.GridPoint.southeast
+                eastingShift = 1.0;
+                northingShift = 0.0;
+            else % center
+                eastingShift = 0.5;
+                northingShift = 0.5;
             end
 
             if coder.target("MATLAB")
@@ -102,25 +111,14 @@ classdef UTM
 
         function [latitudeBounds_deg, longitudeBounds_deg] = getLatLonBounds(obj)
 
-            % Create the UTM coordinate of the North East corner of the 1x1 m square.
-            objNE = obj;
-            if coder.target("MATLAB")
-                for ii = 1:numel(objNE)
-                    objNE(ii).easting = objNE(ii).easting + 1;
-                    objNE(ii).northing = objNE(ii).northing + 1;
-                end
-            else
-                objNE.easting = objNE.easting + 1;
-                objNE.northing = objNE.northing + 1;
-            end
-
             % Convert to latitude and longitude.
             [latSW, lonSW] = obj.toLatLon("southwest");
-            [latNE, lonNE] = objNE.toLatLon("southwest");
+            [latNE, lonNE] = obj.toLatLon("northeast");
 
             % Output the latitude and longitude bounds.
             latitudeBounds_deg = [latSW(:) latNE(:)];
             longitudeBounds_deg = [lonSW(:) lonNE(:)];
+            
         end
 
     end
