@@ -55,7 +55,22 @@ classdef UTM
             utmChar = char(string(obj));
         end
 
-        function [latitude_deg, longitude_deg] = toLatLon(obj)
+        function [latitude_deg, longitude_deg] = toLatLon(obj, gridPoint)
+
+            arguments
+                obj 
+                gridPoint (1,1) mgrs.GridPoint = "center"
+            end
+
+            % Defined the easting & northing shift for the returned
+            % latitude and longitude.
+            if gridPoint == mgrs.GridPoint.center
+                eastingShift = 0.5;
+                northingShift = 0.5;
+            else
+                eastingShift = 0.0;
+                northingShift = 0.0;
+            end
 
             if coder.target("MATLAB")
                 % Allocate latitude and longitude.
@@ -64,7 +79,7 @@ classdef UTM
 
                 for ii = 1:numel(obj)
                     [latitude_deg(ii), longitude_deg(ii)] = mgrs.internal.utmToLatLon( ...
-                        obj(ii).zone, obj(ii).hemisphere, obj(ii).easting, obj(ii).northing );
+                        obj(ii).zone, obj(ii).hemisphere, obj(ii).easting + eastingShift, obj(ii).northing + northingShift );
                 end
             else
                 [latitude_deg, longitude_deg] = mgrs.internal.utmToLatLon( ...
@@ -73,9 +88,16 @@ classdef UTM
 
         end
 
-        function latitudeLongitudePair_deg = toLatLonPair(obj)
-            [latitude_deg, longitude_deg] = obj.toLatLon();
+        function latitudeLongitudePair_deg = toLatLonPair(obj, gridPoint)
+
+            arguments
+                obj 
+                gridPoint (1,1) mgrs.GridPoint = "center"
+            end
+
+            [latitude_deg, longitude_deg] = obj.toLatLon(gridPoint);
             latitudeLongitudePair_deg = [latitude_deg(:) longitude_deg(:)];
+
         end
 
         function [latitudeBounds_deg, longitudeBounds_deg] = getLatLonBounds(obj)
@@ -93,8 +115,8 @@ classdef UTM
             end
 
             % Convert to latitude and longitude.
-            [latSW, lonSW] = obj.toLatLon();
-            [latNE, lonNE] = objNE.toLatLon();
+            [latSW, lonSW] = obj.toLatLon("southwest");
+            [latNE, lonNE] = objNE.toLatLon("southwest");
 
             % Output the latitude and longitude bounds.
             latitudeBounds_deg = [latSW(:) latNE(:)];
