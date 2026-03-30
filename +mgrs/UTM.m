@@ -26,6 +26,21 @@ classdef UTM
             obj.northing = northing;
         end
 
+        function bool = eq(objA, objB)
+
+            arguments
+                objA 
+                objB {mustBeUtmScalarOrSameSize(objA,objB)}
+            end
+
+            bool = true(max(size(objA), size(objB)));
+            bool(:) = bool(:) & [objA.zone]' == [objB.zone]';
+            bool(:) = bool(:) & [objA.hemisphere]' == [objB.hemisphere]';
+            bool(:) = bool(:) & floor([objA.easting]') == floor([objB.easting]');
+            bool(:) = bool(:) & floor([objA.northing]') == floor([objB.northing]');
+
+        end
+
         function utmString = string(obj)
             if coder.target("MATLAB")
                 utmString = strings(size(obj));
@@ -214,5 +229,17 @@ function mustBeUtmString(utmString)
         error( 'MGRS:invalidUtmStrings', ...
             'The following UTM strings are invalid...\n%s', ...
             badList )
+    end
+end
+
+function mustBeUtmScalarOrSameSize(utmA, utmB)
+    if ~isa(utmA,"mgrs.UTM") || ~isa(utmB,"mgrs.UTM")
+        error( 'MGRS:notUtmClass', ...
+            'Both parameters must be objects of the mgrs.UTM class' )
+    end
+
+    if ~isscalar(utmA) && ~isscalar(utmB) && any(size(utmA) ~= size(utmB))
+        error( 'MGRS:sizeDimensionsMustMatch', ...
+            'Arrays have incompatible sizes for this operation.' )
     end
 end

@@ -97,6 +97,24 @@ classdef UTestMgrs < matlab.unittest.TestCase
                 join(distanceOutOfBoundsStr, newline) ) )
         end
 
+        function testUtmEqOperator(testCase)
+            testData = testCase.testCoordinates;
+            testUtm = mgrs.UTM.fromUtmString([testData.utm]);
+
+            testCase.verifyTrue(testUtm(5) == testUtm(5), 'Equality operator failed for scalar-scalar input.')
+            testCase.verifyTrue(any(testUtm(5) == testUtm), 'Equality operator failed for array-scalar input.')
+            testCase.verifyTrue(any(testUtm == testUtm(5)), 'Equality operator failed for scalar-array input.')
+            testCase.verifyTrue(all(testUtm == testUtm), 'Equality operator failed for array-array input.')
+
+            testCase.verifyFalse(testUtm(3) == testUtm(8), 'Equality operator failed for not equal case.')
+
+            testCase.verifyError(@()testUtm == testUtm([4 8]), 'MGRS:sizeDimensionsMustMatch', ...
+                'Equality failed to throw the correct error for array-array input with different sizes.')
+
+            testCase.verifyError(@()testUtm == 7, 'MGRS:notUtmClass', ...
+                'Equality failed to throw the correct error for wrong input type.')
+        end
+
         function testUtmArrayToStrings(testCase)
             testData = testCase.testCoordinates;
             sizeTestData = size(testData);
