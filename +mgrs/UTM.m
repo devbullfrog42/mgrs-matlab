@@ -3,10 +3,10 @@ classdef UTM
     %   Detailed explanation goes here
 
     properties
-        zone (1,1) uint8 {mustBeGreaterThanOrEqual(zone,0), mustBeLessThanOrEqual(zone,60)} = 30
+        zone (1,1) uint8 {mustBeLessThanOrEqual(zone,60)} = 31
         hemisphere (1,1) mgrs.Hemisphere = "North"
-        easting (1,1) double {mustBeGreaterThanOrEqual(easting,0)} = 833978.577
-        northing (1,1) double {mustBeGreaterThanOrEqual(northing,0)} = 0.000
+        easting (1,1) double {mustBeGreaterThanOrEqual(easting,0)} = 166021
+        northing (1,1) double {mustBeGreaterThanOrEqual(northing,0)} = 0
     end
 
     methods
@@ -14,10 +14,10 @@ classdef UTM
         function obj = UTM(zone, hemisphere, easting, northing)
 
             arguments
-                zone (1,1) uint8 {mustBeGreaterThan(zone,0), mustBeLessThanOrEqual(zone,60)} = 30
+                zone (1,1) uint8 {mustBeLessThanOrEqual(zone,60)} = 31
                 hemisphere (1,1) mgrs.Hemisphere = "North"
-                easting (1,1) double {mustBeGreaterThanOrEqual(easting,0)} = 833978.577
-                northing (1,1) double {mustBeGreaterThanOrEqual(northing,0)} = 0.000
+                easting (1,1) double {mustBeGreaterThanOrEqual(easting,0)} = 166021
+                northing (1,1) double {mustBeGreaterThanOrEqual(northing,0)} = 0
             end
 
             obj.zone = zone;
