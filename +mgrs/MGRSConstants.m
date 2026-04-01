@@ -60,5 +60,11 @@ classdef MGRSConstants
 
         % Band letter in Norway grid zones
         NORWAY_BAND_LETTER char = 'V'
+
+        % 100,000 m square column letters
+        COLUMN_LETTERS = {'ABCDEFGH','JKLMNPQR','STUVWXYZ'}
+
+        % 100,000 m square row letters
+        ROW_LETTERS = {'ABCDEFGHJKLMNPQRSTUV','FGHJKLMNPQRSTUVABCDE'}
     end
 end

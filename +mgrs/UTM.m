@@ -43,6 +43,19 @@ classdef UTM
             end
         end
 
+        function mgrsObj = mgrs.MGRS(obj)
+            if coder.target("MATLAB")
+                objSize = size(obj);
+                mgrsObj(objSize(1),objSize(2)) = mgrs.MGRS();
+
+                for ii = 1:numel(obj)
+                    mgrsObj(ii) = mgrs.MGRS(obj(ii).zone, obj(ii).hemisphere, obj(ii).easting, obj(ii).northing);
+                end
+            else
+                mgrsObj = mgrs.MGRS(obj.zone, obj.hemisphere, obj.easting, obj.northing);
+            end
+        end
+
         function bool = eq(objA, objB)
 
             arguments

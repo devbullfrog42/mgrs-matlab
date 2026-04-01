@@ -60,6 +60,18 @@ classdef UTestMgrs < matlab.unittest.TestCase
             end
         end
 
+        function testLatLonToMgrsString(testCase)
+            testData = testCase.testCoordinates;
+            for ii = 1:numel(testData)
+                testMgrs = mgrs.MGRS.fromLatLon(testData(ii).lat, testData(ii).lon);
+                testCase.verifyMatches( ...
+                    string(testMgrs), ...
+                    testData(ii).mgrs, ...
+                    sprintf('Geolocation %f deg, %f deg converts to MGRS string "%s" instead of the expected "%s".', ...
+                    testData(ii).lat, testData(ii).lon, string(testMgrs), testData(ii).mgrs) )
+            end
+        end
+
         function testUtmCoordinatesContainLatLon(testCase)
             testData = testCase.testCoordinates;
             testLatitudes_deg = [testData.lat]';
