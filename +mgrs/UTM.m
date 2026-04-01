@@ -179,7 +179,7 @@ classdef UTM
         function obj = fromLatLonPair(latitudeLongitudePair_deg)
 
             arguments
-                latitudeLongitudePair_deg (2,:) double
+                latitudeLongitudePair_deg (:,2) double
             end
 
             latitude_deg = latitudeLongitudePair_deg(:,1);
