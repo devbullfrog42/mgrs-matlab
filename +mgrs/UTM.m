@@ -24,6 +24,23 @@ classdef UTM
             obj.hemisphere = hemisphere;
             obj.easting = easting;
             obj.northing = northing;
+
+            % If UTM coordinate is outside valid latitudes, set object to
+            % general polar region value.
+            latitude_deg = obj.toLatLon();
+            if latitude_deg > mgrs.MGRSConstants.MAX_LAT
+                % North polar region
+                obj.zone = 0;
+                obj.hemisphere = "North";
+                obj.easting = 0;
+                obj.northing = 0;
+            elseif latitude_deg < mgrs.MGRSConstants.MIN_LAT
+                % South polar region
+                obj.zone = 0;
+                obj.hemisphere = "South";
+                obj.easting = 0;
+                obj.northing = 0;
+            end
         end
 
         function bool = eq(objA, objB)

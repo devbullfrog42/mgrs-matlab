@@ -134,6 +134,28 @@ classdef UTestMgrs < matlab.unittest.TestCase
                 'mgrs.UTM.char did not return a character array.')
         end
 
+        function testPolarRegionUtm(testCase)
+            % Furthest North, non polar UTM
+            testUtm = mgrs.UTM.fromLatLon(84,3);
+            testCase.verifyEqual( string(testUtm), "31N 500000 9328093", ...
+                'A UTM at 84.0N 3.0E did not return the expected specific UTM string "31N 500000 9328093".' )
+
+            % North polar UTM
+            testUtm = mgrs.UTM.fromLatLon(84.1,3);
+            testCase.verifyEqual( string(testUtm), "00N 000000 0000000", ...
+                'A UTM above 84.0N did not return the expected general North polar UTM string "00N 000000 0000000".' )
+
+            % Furthest South, non polar UTM
+            testUtm = mgrs.UTM.fromLatLon(-80,3);
+            testCase.verifyEqual( string(testUtm), "31S 500000 1118414", ...
+                'A UTM at 80.0S 3.0E did not return the expected specific UTM string "31S 500000 1118414".' )
+
+            % South polar UTM
+            testUtm = mgrs.UTM.fromLatLon(-80.1,3);
+            testCase.verifyEqual( string(testUtm), "00S 000000 0000000", ...
+                'A UTM below 80.0S did not return the expected general South polar UTM string "00S 000000 0000000".' )
+        end
+
         function testGetBandLetter(testCase)
             testData = testCase.testLatitudeBands;
             for ii = 1:numel(testData)
