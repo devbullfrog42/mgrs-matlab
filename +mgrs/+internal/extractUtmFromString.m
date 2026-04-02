@@ -15,8 +15,7 @@ function [zone, hemisphere, easting, northing] = extractUtmFromString(utmString)
     zone = uint8(str2double(zoneStr));
 
     % Get the hemisphere.
-    utmChar = char(utmString);
-    if matches(utmChar(letterPosition), 'N', 'IgnoreCase', true)
+    if matches(utmString.extract(letterPosition), 'N', 'IgnoreCase', true)
         hemisphere = mgrs.Hemisphere.North;
     else
         hemisphere = mgrs.Hemisphere.South;

@@ -82,10 +82,67 @@ classdef MGRS < mgrs.UTM
     methods ( Static )
 
         function obj = fromLatLon(latitude_deg, longitude_deg)
+
+            arguments
+                latitude_deg double {mustBeVector}
+                longitude_deg  double {mustBeVector}
+            end
+
             utmObj = fromLatLon@mgrs.UTM(latitude_deg, longitude_deg);
             obj = mgrs.MGRS(utmObj);
+            
+        end
+
+        function obj = fromLatLonPair(latitudeLongitudePair_deg)
+
+            arguments
+                latitudeLongitudePair_deg (:,2) double
+            end
+
+            utmObj = fromLatLonPair@mgrs.UTM(latitudeLongitudePair_deg);
+            obj = mgrs.MGRS(utmObj);
+
+        end
+
+        function obj = fromString(mgrsString)
+
+            arguments
+                mgrsString string {mustBeMgrsString}
+            end
+
+            if coder.target("MATLAB")
+                if verLessThan('matlab', '24.2') %#ok<VERLESSMATLAB>
+                    mgrsSize = size(mgrsString);
+                    obj(mgrsSize(1),mgrsSize(2)) = mgrs.MGRS();
+                else
+                    obj = createArray(size(mgrsString), 'mgrs.MGRS');
+                end
+
+                for ii = 1:numel(mgrsString)
+                    [zone, band, column, row, easting, northing] = mgrs.internal.extractMgrsFromString(mgrsString(ii));
+                    obj(ii) = mgrs.MGRS(zone, band, column, row, easting, northing);
+                end
+            else
+                [zone, band, column, row, easting, northing] = mgrs.internal.extractMgrsFromString(mgrsString);
+                obj = mgrs.MGRS(zone, band, column, row, easting, northing);
+            end
+
         end
 
     end
 
+end
+
+function mustBeMgrsString(mgrsString)
+    bool = ~mgrs.isMgrsString(mgrsString);
+    if any(bool)
+        [badr, badc] = ind2sub(size(bool), find(bool));
+        badList = string();
+        for ii = 1:numel(badr)
+            badList = badList + sprintf("    %s at subscript (%d,%d)", mgrsString(badr(ii),badc(ii)), badr(ii), badc(ii)) + newline;
+        end
+        error( 'MGRS:invalidMgrsStrings', ...
+            'The following MGRS strings are invalid...\n%s', ...
+            badList )
+    end
 end

@@ -154,18 +154,6 @@ classdef UTM
 
         end
 
-        function [latitudeBounds_deg, longitudeBounds_deg] = getLatLonBounds(obj)
-
-            % Convert to latitude and longitude.
-            [latSW, lonSW] = obj.toLatLon("southwest");
-            [latNE, lonNE] = obj.toLatLon("northeast");
-
-            % Output the latitude and longitude bounds.
-            latitudeBounds_deg = [latSW(:) latNE(:)];
-            longitudeBounds_deg = [lonSW(:) lonNE(:)];
-            
-        end
-
     end
 
     methods ( Static )
@@ -204,6 +192,7 @@ classdef UTM
                 [zone, hemisphere, easting, northing] = mgrs.internal.latLonToUtm(latitude_deg, longitude_deg);
                 obj = mgrs.UTM(zone, hemisphere, easting, northing);
             end
+
         end
 
         function obj = fromLatLonPair(latitudeLongitudePair_deg)
@@ -219,7 +208,7 @@ classdef UTM
 
         end
 
-        function obj = fromUtmString(utmString)
+        function obj = fromString(utmString)
 
             arguments
                 utmString string {mustBeUtmString}

@@ -77,7 +77,7 @@ classdef UTestMgrs < matlab.unittest.TestCase
             testLatitudes_deg = [testData.lat]';
             testLongitudes_deg = [testData.lon]';
             testUtmStr = [testData.utm]';
-            testUtmCoords = mgrs.UTM.fromUtmString(testUtmStr);
+            testUtmCoords = mgrs.UTM.fromString(testUtmStr);
 
             % Get the coordinate corners in latitude & longitude.
             testCoordsSW = testUtmCoords.toLatLonPair("southwest");
@@ -109,9 +109,76 @@ classdef UTestMgrs < matlab.unittest.TestCase
                 join(distanceOutOfBoundsStr, newline) ) )
         end
 
+        function testMgrsCoordinatesContainLatLon(testCase)
+            % Skip
+            testCase.assumeFail()
+
+            testData = testCase.testCoordinates;
+            testLatitudes_deg = [testData.lat]';
+            testLongitudes_deg = [testData.lon]';
+            testUtmStr = [testData.utm]';
+            testMgrsCoords = mgrs.MGRS.fromString(testUtmStr);
+
+            % Get the coordinate corners in latitude & longitude.
+            testCoordsSW = testMgrsCoords.toLatLonPair("southwest");
+            testCoordsNE = testMgrsCoords.toLatLonPair("northeast");
+            testCoordsCenter = testMgrsCoords.toLatLonPair("center");
+
+            % Calc the angular distance of the corners from the center.
+            swDistance = vecnorm(testCoordsSW - testCoordsCenter, 2, 2);
+            neDistance = vecnorm(testCoordsNE - testCoordsCenter, 2, 2);
+            maxDistance = max(swDistance, neDistance);
+
+            % Calc the angular distance from the center to the given
+            % latitude and longitude.
+            testLatLon = [testLatitudes_deg testLongitudes_deg];
+            distance = vecnorm(testLatLon - testCoordsCenter, 2, 2);
+
+            % Check if any distances are greater than the max.
+            distanceInBound = distance < maxDistance;
+
+            % If any distances are out of bounds, fail the test.
+            if any(~distanceInBound)
+                distanceOutOfBoundsStr = compose("(%d) %s", find(~distanceInBound), testUtmStr(~distanceInBound));
+            else
+                distanceOutOfBoundsStr = "";
+            end
+
+            testCase.verifyTrue( all(distanceInBound), ...
+                sprintf( "The following test latitude & longitude coordinates where out of bounds of their MGRS 1x1 m square:\n%s\n", ...
+                join(distanceOutOfBoundsStr, newline) ) )
+        end
+
+        function testUtmFromLatLonPair(testCase)
+            testData = testCase.testCoordinates;
+            testLatLonPairs = [testData.lat; testData.lon]';
+            testUtm = mgrs.UTM.fromLatLonPair(testLatLonPairs);
+            testCase.verifyClass( testUtm, 'mgrs.UTM', ...
+                'mgrs.UTM.fromLatLonPair did not return an object of type "mgrs.UTM".' )
+        end
+
+        function testMgrsFromLatLonPair(testCase)
+            testData = testCase.testCoordinates;
+            testLatLonPairs = [testData.lat; testData.lon]';
+            testMgrs = mgrs.MGRS.fromLatLonPair(testLatLonPairs);
+            testCase.verifyClass( testMgrs, 'mgrs.MGRS', ...
+                'mgrs.MGRS.fromLatLonPair did not return an object of type "mgrs.MGRS".' )
+        end
+
+        function testMgrsConversionToUtm(testCase)
+            % Skip
+            testCase.assumeFail()
+
+            testData = testCase.testCoordinates;
+            testMgrs = mgrs.MGRS.fromString([testData.mgrs]);
+            testUtm = mgrs.UTM(testMgrs);
+            testCase.verifyClass( testUtm, 'mgrs.UTM', ...
+                'Conversion from MGRS to UTM failed.' )
+        end
+
         function testUtmEqOperator(testCase)
             testData = testCase.testCoordinates;
-            testUtm = mgrs.UTM.fromUtmString([testData.utm]);
+            testUtm = mgrs.UTM.fromString([testData.utm]);
 
             testCase.verifyTrue(testUtm(5) == testUtm(5), 'Equality operator failed for scalar-scalar input.')
             testCase.verifyTrue(any(testUtm(5) == testUtm), 'Equality operator failed for array-scalar input.')
@@ -124,6 +191,27 @@ classdef UTestMgrs < matlab.unittest.TestCase
                 'Equality failed to throw the correct error for array-array input with different sizes.')
 
             testCase.verifyError(@()testUtm == 7, 'MGRS:notUtmClass', ...
+                'Equality failed to throw the correct error for wrong input type.')
+        end
+
+        function testMgrsEqOperator(testCase)
+            % Skip
+            testCase.assumeFail()
+
+            testData = testCase.testCoordinates;
+            testMgrs = mgrs.MGRS.fromString([testData.mgrs]);
+
+            testCase.verifyTrue(testMgrs(5) == testMgrs(5), 'Equality operator failed for scalar-scalar input.')
+            testCase.verifyTrue(any(testMgrs(5) == testMgrs), 'Equality operator failed for array-scalar input.')
+            testCase.verifyTrue(any(testMgrs == testMgrs(5)), 'Equality operator failed for scalar-array input.')
+            testCase.verifyTrue(all(testMgrs == testMgrs), 'Equality operator failed for array-array input.')
+
+            testCase.verifyFalse(testMgrs(3) == testMgrs(8), 'Equality operator failed for not equal case.')
+
+            testCase.verifyError(@()testMgrs == testMgrs([4 8]), 'MGRS:sizeDimensionsMustMatch', ...
+                'Equality failed to throw the correct error for array-array input with different sizes.')
+
+            testCase.verifyError(@()testMgrs == 7, 'MGRS:notMgrsClass', ...
                 'Equality failed to throw the correct error for wrong input type.')
         end
 

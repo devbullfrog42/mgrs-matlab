@@ -10,7 +10,7 @@ function bool = isUtmString(utmString)
     % Check each string
     bool = true(size(utmString));
     for ii = 1:numel(utmString)
-        % Confirm there is only on letter
+        % Confirm there is only one letter
         letters = isletter(utmString(ii));
         bool(ii) = bool(ii) && (sum(letters) == 1);
         if ~bool(ii)
@@ -29,9 +29,13 @@ function bool = isUtmString(utmString)
         zoneString = extractBefore(utmString(ii), hemisphereLetterPos);
         eastingNorthingString = extractAfter(utmString(ii), hemisphereLetterPos);
 
-        % Confirm the zone string is either one or two digits.
+        % Confirm the zone string is either one or two digits and is a valid zone number.
         bool(ii) = bool(ii) && all(isstrprop(zoneString, "digit"));
         bool(ii) = bool(ii) && (strlength(zoneString) == 1 || strlength(zoneString) == 2);
+        if bool(ii)
+            zoneNumber = str2double(zoneString);
+            bool(ii) = zoneNumber <= mgrs.MGRSConstants.MAX_ZONE_NUMBER && zoneNumber >= mgrs.MGRSConstants.MIN_ZONE_NUMBER;
+        end
 
         % Confirm the easting/northing string is 13 digits exactly.
         bool(ii) = bool(ii) && all(isstrprop(eastingNorthingString, "digit"));
