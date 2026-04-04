@@ -1,28 +1,73 @@
 classdef MGRS < mgrs.UTM
     %mgrs.MGRS Military Grid Reference System
 
-    properties ( Dependent, SetAccess = private )
-        band char
-    end
-
-    properties ( Dependent )
-        column char
-        row char
+    properties
+        band (1,1) char = 'N'
+        column (1,1) char = 'A'
+        row (1,1) char = 'A'
     end
 
     methods
 
+        function obj = MGRS(zone, band, column, row, easting, northing)
+
+            arguments
+                zone (1,1) uint8 {mustBeLessThanOrEqual(zone,60)} = 31
+                band (1,1) char = 'N'
+                column (1,1) char = 'A'
+                row (1,1) char = 'A'
+                easting (1,1) double {mustBeGreaterThanOrEqual(easting,0)} = 66021
+                northing (1,1) double {mustBeGreaterThanOrEqual(northing,0)} = 0
+            end
+
+            obj.zone = zone;
+            obj.band = band;
+            obj.column = column;
+            obj.row = row;
+            obj.easting = easting;
+            obj.northing = northing;
+
+            if obj.band > mgrs.MGRSConstants.BAND_LETTER_SOUTH
+                obj.hemisphere = "North";
+            else
+                obj.hemisphere = "South";
+            end
+        end
+
         function utmObj = mgrs.UTM(obj)
             if coder.target("MATLAB")
-                objSize = size(obj);
-                utmObj(objSize(1),objSize(2)) = mgrs.UTM();
+                if verLessThan('matlab', '24.2') %#ok<VERLESSMATLAB>
+                    objSize = size(obj);
+                    utmObj(objSize(1),objSize(2)) = mgrs.UTM();
+                else
+                    utmObj = createArray(size(obj), 'mgrs.UTM');
+                end
 
                 for ii = 1:numel(obj)
-                    utmObj(ii) = mgrs.UTM(obj(ii).zone, obj(ii).hemisphere, obj(ii).easting, obj(ii).northing);
+                    [zone, hemisphere, easting, northing] = mgrs.internal.mgrsToUtm(obj(ii).zone, obj(ii).band, obj(ii).column, obj(ii).row, obj(ii).easting, obj(ii).northing);
+                    utmObj(ii) = mgrs.UTM(zone, hemisphere, easting, northing);
                 end
             else
-                utmObj = mgrs.UTM(obj.zone, obj.hemisphere, obj.easting, obj.northing);
+                [zone, hemisphere, easting, northing] = mgrs.internal.mgrsToUtm(obj.zone, obj.band, obj.column, obj.row, obj.easting, obj.northing);
+                utmObj = mgrs.UTM(zone, hemisphere, easting, northing);
             end
+        end
+
+        function bool = eq(objA, objB)
+
+            arguments
+                objA 
+                objB {mustBeMgrsScalarOrSameSize(objA,objB)}
+            end
+
+            bool = true(max(size(objA), size(objB)));
+            bool(:) = bool(:) & [objA.zone]' == [objB.zone]';
+            bool(:) = bool(:) & [objA.band]' == [objB.band]';
+            bool(:) = bool(:) & [objA.column]' == [objB.column]';
+            bool(:) = bool(:) & [objA.row]' == [objB.row]';
+            bool(:) = bool(:) & floor([objA.easting]') == floor([objB.easting]');
+            bool(:) = bool(:) & floor([objA.northing]') == floor([objB.northing]');
+
         end
 
         function mgrsString = string(obj)
@@ -54,27 +99,16 @@ classdef MGRS < mgrs.UTM
             end
         end
 
-        function value = get.band(obj)
-            latitude_deg = obj.toLatLon();
-            if latitude_deg > mgrs.MGRSConstants.MAX_LAT
-                value = mgrs.MGRSConstants.MAX_BAND_LETTER;
-            elseif latitude_deg < mgrs.MGRSConstants.MIN_LAT
-                value = mgrs.MGRSConstants.MIN_BAND_LETTER;
-            else
-                value = mgrs.gridZone.getBandLetter(latitude_deg);
+        function [latitude_deg, longitude_deg] = toLatLon(obj, gridPoint)
+
+            arguments
+                obj 
+                gridPoint (1,1) mgrs.GridPoint = "center"
             end
-        end
 
-        function value = get.column(obj)
-            easting100k = mod(floor(obj.easting/100000), 8);
-            zoneSet = mod(obj.zone-1,3) + 1;
-            value = mgrs.MGRSConstants.COLUMN_LETTERS{zoneSet}(easting100k);
-        end
+            utmObj = mgrs.UTM(obj);
+            [latitude_deg, longitude_deg] = utmObj.toLatLon(gridPoint);
 
-        function value = get.row(obj)
-            northing100k = mod(floor(obj.northing/100000), 20);
-            zoneSet = mod(obj.zone-1,2) + 1;
-            value = mgrs.MGRSConstants.ROW_LETTERS{zoneSet}(northing100k+1);
         end
 
     end
@@ -144,5 +178,17 @@ function mustBeMgrsString(mgrsString)
         error( 'MGRS:invalidMgrsStrings', ...
             'The following MGRS strings are invalid...\n%s', ...
             badList )
+    end
+end
+
+function mustBeMgrsScalarOrSameSize(utmA, utmB)
+    if ~isa(utmA,"mgrs.MGRS") || ~isa(utmB,"mgrs.MGRS")
+        error( 'MGRS:notMgrsClass', ...
+            'Both parameters must be objects of the mgrs.MGRS class' )
+    end
+
+    if ~isscalar(utmA) && ~isscalar(utmB) && any(size(utmA) ~= size(utmB))
+        error( 'MGRS:sizeDimensionsMustMatch', ...
+            'Arrays have incompatible sizes for this operation.' )
     end
 end

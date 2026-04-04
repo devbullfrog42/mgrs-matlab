@@ -4,7 +4,7 @@ function [zone, hemisphere, easting, northing] = extractUtmFromString(utmString)
         utmString (1,1) string
     end
 
-    % Erase all spaces
+    % Erase all spaces.
     utmString = erase(utmString, ' ');
 
     % Find the hemisphere letter.

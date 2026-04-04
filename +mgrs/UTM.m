@@ -45,14 +45,22 @@ classdef UTM
 
         function mgrsObj = mgrs.MGRS(obj)
             if coder.target("MATLAB")
-                objSize = size(obj);
-                mgrsObj(objSize(1),objSize(2)) = mgrs.MGRS();
+                if verLessThan('matlab', '24.2') %#ok<VERLESSMATLAB>
+                    objSize = size(obj);
+                    mgrsObj(objSize(1),objSize(2)) = mgrs.MGRS();
+                else
+                    mgrsObj = createArray(size(obj), 'mgrs.MGRS');
+                end
 
                 for ii = 1:numel(obj)
-                    mgrsObj(ii) = mgrs.MGRS(obj(ii).zone, obj(ii).hemisphere, obj(ii).easting, obj(ii).northing);
+                    [zone, band, column, row, easting, northing] = mgrs.internal.utmToMgrs( ...
+                        obj(ii).zone, obj(ii).hemisphere, obj(ii).easting, obj(ii).northing ); %#ok<PROP>
+                    mgrsObj(ii) = mgrs.MGRS(zone, band, column, row, easting, northing); %#ok<PROP>
                 end
             else
-                mgrsObj = mgrs.MGRS(obj.zone, obj.hemisphere, obj.easting, obj.northing);
+                [zone, band, column, row, easting, northing] = mgrs.internal.utmToMgrs( ...
+                    obj.zone, obj.hemisphere, obj.easting, obj.northing ); %#ok<PROP>
+                mgrsObj = mgrs.MGRS(zone, band, column, row, easting, northing); %#ok<PROP>
             end
         end
 

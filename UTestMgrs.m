@@ -110,14 +110,11 @@ classdef UTestMgrs < matlab.unittest.TestCase
         end
 
         function testMgrsCoordinatesContainLatLon(testCase)
-            % Skip
-            testCase.assumeFail()
-
             testData = testCase.testCoordinates;
             testLatitudes_deg = [testData.lat]';
             testLongitudes_deg = [testData.lon]';
-            testUtmStr = [testData.utm]';
-            testMgrsCoords = mgrs.MGRS.fromString(testUtmStr);
+            testMgrsStr = [testData.mgrs]';
+            testMgrsCoords = mgrs.MGRS.fromString(testMgrsStr);
 
             % Get the coordinate corners in latitude & longitude.
             testCoordsSW = testMgrsCoords.toLatLonPair("southwest");
@@ -139,7 +136,7 @@ classdef UTestMgrs < matlab.unittest.TestCase
 
             % If any distances are out of bounds, fail the test.
             if any(~distanceInBound)
-                distanceOutOfBoundsStr = compose("(%d) %s", find(~distanceInBound), testUtmStr(~distanceInBound));
+                distanceOutOfBoundsStr = compose("(%d) %s", find(~distanceInBound), testMgrsStr(~distanceInBound));
             else
                 distanceOutOfBoundsStr = "";
             end
@@ -166,14 +163,18 @@ classdef UTestMgrs < matlab.unittest.TestCase
         end
 
         function testMgrsConversionToUtm(testCase)
-            % Skip
-            testCase.assumeFail()
-
             testData = testCase.testCoordinates;
             testMgrs = mgrs.MGRS.fromString([testData.mgrs]);
             testUtm = mgrs.UTM(testMgrs);
             testCase.verifyClass( testUtm, 'mgrs.UTM', ...
                 'Conversion from MGRS to UTM failed.' )
+            for ii = 1:numel(testUtm)
+                testCase.verifyMatches( ...
+                    string(testUtm(ii)), ...
+                    testData(ii).utm, ...
+                    sprintf('MGRS string "%s" converts to UTM string "%s" instead of the expected "%s".', ...
+                    testData(ii).mgrs, string(testUtm(ii)), testData(ii).utm) )
+            end
         end
 
         function testUtmEqOperator(testCase)
@@ -195,9 +196,6 @@ classdef UTestMgrs < matlab.unittest.TestCase
         end
 
         function testMgrsEqOperator(testCase)
-            % Skip
-            testCase.assumeFail()
-
             testData = testCase.testCoordinates;
             testMgrs = mgrs.MGRS.fromString([testData.mgrs]);
 
