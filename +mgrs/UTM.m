@@ -27,19 +27,27 @@ classdef UTM < matlab.mixin.CustomDisplay
 
             % If UTM coordinate is outside valid latitudes, set object to
             % general polar region value.
-            latitude_deg = obj.toLatLon();
-            if latitude_deg > mgrs.MGRSConstants.MAX_LAT
-                % North polar region
-                obj.zone = 0;
-                obj.hemisphere = "North";
-                obj.easting = 0;
-                obj.northing = 0;
-            elseif latitude_deg < mgrs.MGRSConstants.MIN_LAT
-                % South polar region
-                obj.zone = 0;
-                obj.hemisphere = "South";
-                obj.easting = 0;
-                obj.northing = 0;
+            if (obj.hemisphere == mgrs.Hemisphere.North && northing > 9328000) ...
+                    || (obj.hemisphere == mgrs.Hemisphere.South && northing < 1119000)
+                if obj.hemisphere == mgrs.Hemisphere.North
+                    latitude_deg = obj.toLatLon("southwest");
+                else
+                    latitude_deg = obj.toLatLon("northwest");
+                end
+
+                if latitude_deg > mgrs.MGRSConstants.MAX_LAT
+                    % North polar region
+                    obj.zone = 0;
+                    obj.hemisphere = "North";
+                    obj.easting = 0;
+                    obj.northing = 0;
+                elseif latitude_deg < mgrs.MGRSConstants.MIN_LAT
+                    % South polar region
+                    obj.zone = 0;
+                    obj.hemisphere = "South";
+                    obj.easting = 0;
+                    obj.northing = 0;
+                end
             end
         end
 
