@@ -1,4 +1,4 @@
-classdef UTM
+classdef UTM < matlab.mixin.CustomDisplay
     %UTM Universal Tranverse Mercator Coordinate System
     %   Detailed explanation goes here
 
@@ -160,6 +160,33 @@ classdef UTM
             [latitude_deg, longitude_deg] = obj.toLatLon(gridPoint);
             latitudeLongitudePair_deg = [latitude_deg(:) longitude_deg(:)];
 
+        end
+
+    end
+
+    methods ( Access = protected )
+
+        function displayScalarObject(obj)
+            classLink = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
+            header = "  " + classLink + " coordinate" + newline;
+            disp(header)
+
+            disp("    " + string(obj) + newline)
+
+            footer = obj.getFooter();
+            disp(footer)
+        end
+
+        function displayNonScalarObject(obj)
+            dimStr = matlab.mixin.CustomDisplay.convertDimensionsToString(obj);
+            classLink = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
+            header = "  " + dimStr + " " + classLink + " array" + newline;
+            disp(header)
+
+            disp(string(obj))
+
+            footer = obj.getFooter();
+            disp(footer)
         end
 
     end
