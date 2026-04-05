@@ -1,4 +1,23 @@
 function bool = isUtmString(utmString)
+    %ISUTMSTRING Validate UTM coordinate string format
+    %   TF = ISUTMSTRING(STR) returns true if STR is a valid UTM
+    %   coordinate string, false otherwise. STR can be a string array.
+    %
+    %   Valid UTM format: "ZZH EEEEEE NNNNNNN"
+    %   where:
+    %       ZZ  - Zone number (1-60, 1 or 2 digits)
+    %       H   - Hemisphere ('N' or 'S')
+    %       EEEEEE - 6-digit easting (with leading zeros)
+    %       NNNNNNN - 7-digit northing (with leading zeros)
+    %
+    %   Spaces are ignored. The function validates zone numbers,
+    %   hemisphere letters, and digit counts.
+    %
+    %   Example:
+    %       tf = mgrs.isUtmString("31N 166021 0000000");  % true
+    %       tf = mgrs.isUtmString("invalid");             % false
+    %
+    %   See also: mgrs.isMgrsString, mgrs.UTM.fromString
 
     arguments
         utmString string

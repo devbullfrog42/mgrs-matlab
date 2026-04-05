@@ -1,5 +1,48 @@
 classdef MGRS < mgrs.UTM
-    %mgrs.MGRS Military Grid Reference System
+    %MGRS Military Grid Reference System coordinate class
+    %   The MGRS class represents coordinates in the Military Grid Reference
+    %   System, which extends the Universal Transverse Mercator (UTM) system
+    %   with an additional grid overlay for more precise location specification.
+    %
+    %   MGRS coordinates consist of:
+    %   - UTM zone number (1-60)
+    %   - Latitude band letter (C-X, excluding I and O)
+    %   - 100km grid square identifier (column and row letters)
+    %   - Easting and northing within the 100km square (0-99,999 meters)
+    %
+    %   MGRS provides 1-meter precision within 100km x 100km grid squares.
+    %
+    %   Properties:
+    %       zone      - UTM zone number (1-60)
+    %       band      - Latitude band letter (C-X)
+    %       column    - 100km square column letter
+    %       row       - 100km square row letter
+    %       easting   - Easting within 100km square (0-99,999 meters)
+    %       northing  - Northing within 100km square (0-99,999 meters)
+    %       hemisphere - North or South (derived from band)
+    %
+    %   Methods:
+    %       MGRS      - Constructor
+    %       mgrs.UTM  - Convert to UTM coordinates
+    %       toLatLon  - Convert to latitude/longitude
+    %       string    - Format as MGRS string
+    %       eq        - Test equality with another MGRS object
+    %
+    %   Static Methods:
+    %       fromLatLon     - Create from latitude/longitude
+    %       fromLatLonPair - Create from [lat, lon] pairs
+    %       fromString     - Parse MGRS string
+    %
+    %   Example:
+    %       % Create MGRS coordinate for Null Island (0°N, 0°E)
+    %       mgrsCoord = mgrs.MGRS.fromLatLon(0, 0);
+    %       disp(string(mgrsCoord));  % "31N AA 66021 00000"
+    %
+    %       % Parse MGRS string
+    %       mgrsCoord = mgrs.MGRS.fromString("31N AA 66021 00000");
+    %       [lat, lon] = mgrsCoord.toLatLon();
+    %
+    %   See also: mgrs.UTM, mgrs.isMgrsString
 
     properties
         band (1,1) char = 'N'

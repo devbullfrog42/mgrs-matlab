@@ -1,4 +1,20 @@
 function letter = getBandLetter(latitude_deg)
+    %GETBANDLETTER Get latitude band letter from latitude
+    %   LETTER = GETBANDLETTER(LAT) returns the MGRS latitude band
+    %   letter (C-X) for the given latitude. Bands are 8° high except
+    %   for the X band which is 12° high.
+    %
+    %   Input:
+    %       LAT - Latitude in degrees (-90 to 90)
+    %
+    %   Output:
+    %       LETTER - Band letter ('C' to 'X')
+    %
+    %   Example:
+    %       band = mgrs.gridZone.getBandLetter(0);   % 'N'
+    %       band = mgrs.gridZone.getBandLetter(80);  % 'X'
+    %
+    %   See also: mgrs.gridZone.getBandLimits, mgrs.gridZone.getZoneNumber
 
     arguments
         latitude_deg double {mustBeGreaterThanOrEqual(latitude_deg,-90), mustBeLessThanOrEqual(latitude_deg,90)}

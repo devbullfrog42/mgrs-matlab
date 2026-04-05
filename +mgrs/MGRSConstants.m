@@ -1,5 +1,33 @@
 classdef MGRSConstants
-    % Military Grid Reference System Constants
+    %MGRSCONSTANTS Military Grid Reference System constants
+    %   MGRSConstants contains all the constant values used throughout
+    %   the MGRS and UTM coordinate system implementations. These include
+    %   latitude/longitude bounds, zone and band parameters, and special
+    %   region definitions.
+    %
+    %   Properties:
+    %       MIN_LON, MAX_LON             - Longitude bounds (-180° to 180°)
+    %       MIN_LAT, MAX_LAT             - Latitude bounds (-80° to 84°)
+    %       MIN_ZONE_NUMBER              - Minimum UTM zone (1)
+    %       MAX_ZONE_NUMBER              - Maximum UTM zone (60)
+    %       ZONE_WIDTH                   - Zone width in degrees (6°)
+    %       MIN_BAND_LETTER              - First band letter ('C')
+    %       MAX_BAND_LETTER              - Last band letter ('X')
+    %       NUM_BANDS                    - Number of latitude bands (20)
+    %       BAND_HEIGHT                  - Standard band height (8°)
+    %       MAX_BAND_HEIGHT              - Height of X band (12°)
+    %       BAND_LETTER_SOUTH            - Last southern band ('M')
+    %       BAND_LETTER_NORTH            - First northern band ('N')
+    %       MIN_SVALBARD_ZONE_NUMBER     - Svalbard zone range start (31)
+    %       MAX_SVALBARD_ZONE_NUMBER     - Svalbard zone range end (37)
+    %       SVALBARD_BAND_LETTER         - Band letter for Svalbard ('X')
+    %       MIN_NORWAY_ZONE_NUMBER       - Norway zone range start (31)
+    %       MAX_NORWAY_ZONE_NUMBER       - Norway zone range end (32)
+    %       NORWAY_BAND_LETTER           - Band letter for Norway ('V')
+    %       COLUMN_LETTERS               - 100km square column letter sets
+    %       ROW_LETTERS                  - 100km square row letter sets
+    %
+    %   See also: mgrs.MGRS, mgrs.UTM
     properties ( Constant )
         % Minimum longitude (deg)
         MIN_LON double = -180.0

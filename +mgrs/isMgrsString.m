@@ -1,4 +1,24 @@
 function bool = isMgrsString(mgrsString)
+    %ISMGRSSTRING Validate MGRS coordinate string format
+    %   TF = ISMGRSTRING(STR) returns true if STR is a valid MGRS
+    %   coordinate string, false otherwise. STR can be a string array.
+    %
+    %   Valid MGRS format: "ZZB CC EEEEE NNNNN"
+    %   where:
+    %       ZZ   - Zone number (1-60, 1 or 2 digits)
+    %       B    - Band letter (C-X, excluding I and O)
+    %       CC   - Column and row letters for 100km square
+    %       EEEEE - 5-digit easting (0-99999)
+    %       NNNNN - 5-digit northing (0-99999)
+    %
+    %   Spaces are ignored. The function validates zone numbers,
+    %   band letters, column/row letters (zone-dependent), and digit counts.
+    %
+    %   Example:
+    %       tf = mgrs.isMgrsString("31N AA 66021 00000");  % true
+    %       tf = mgrs.isMgrsString("invalid");             % false
+    %
+    %   See also: mgrs.isUtmString, mgrs.MGRS.fromString
 
     arguments
         mgrsString string

@@ -1,6 +1,46 @@
 classdef UTM < matlab.mixin.CustomDisplay
-    %UTM Universal Tranverse Mercator Coordinate System
-    %   Detailed explanation goes here
+    %UTM Universal Transverse Mercator coordinate class
+    %   The UTM class represents coordinates in the Universal Transverse
+    %   Mercator coordinate system, a 2D Cartesian coordinate system that
+    %   divides the Earth into 60 zones, each 6° wide in longitude.
+    %
+    %   UTM coordinates consist of:
+    %   - Zone number (1-60, covering 180°W to 180°E)
+    %   - Hemisphere (North or South)
+    %   - Easting (meters from central meridian, with 500km false easting)
+    %   - Northing (meters from equator, with 10Mm false northing for South)
+    %
+    %   UTM provides meter-level precision for mapping applications.
+    %
+    %   Properties:
+    %       zone       - UTM zone number (1-60)
+    %       hemisphere - North or South hemisphere
+    %       easting    - East-west coordinate in meters
+    %       northing   - North-south coordinate in meters
+    %
+    %   Methods:
+    %       UTM         - Constructor
+    %       mgrs.MGRS   - Convert to MGRS coordinates
+    %       toLatLon    - Convert to latitude/longitude
+    %       toLatLonPair - Convert to [lat, lon] pairs
+    %       string      - Format as UTM string
+    %       eq          - Test equality with another UTM object
+    %
+    %   Static Methods:
+    %       fromLatLon     - Create from latitude/longitude
+    %       fromLatLonPair - Create from [lat, lon] pairs
+    %       fromString     - Parse UTM string
+    %
+    %   Example:
+    %       % Create UTM coordinate for Null Island (0°N, 0°E)
+    %       utmCoord = mgrs.UTM.fromLatLon(0, 0);
+    %       disp(string(utmCoord));  % "31N 166021 0000000"
+    %
+    %       % Parse UTM string
+    %       utmCoord = mgrs.UTM.fromString("31N 166021 0000000");
+    %       [lat, lon] = utmCoord.toLatLon();
+    %
+    %   See also: mgrs.MGRS, mgrs.isUtmString
 
     properties
         zone (1,1) uint8 {mustBeLessThanOrEqual(zone,60)} = 31
