@@ -8,8 +8,10 @@
 %   MGRSConstants - Constants used in MGRS/UTM calculations
 %
 % Functions:
-%   isMgrsString  - Validate MGRS coordinate string format
-%   isUtmString   - Validate UTM coordinate string format
+%   isMgrsString       - Validate MGRS coordinate string format
+%   isUtmString        - Validate UTM coordinate string format
+%   utmStringToLatLon  - Convert UTM string to latitude and longitude
+%   mgrsStringToLatLon - Convert MGRS string to latitude and longitude
 %
 % Grid Zone Functions:
 %   getBandLetter     - Get latitude band letter from latitude

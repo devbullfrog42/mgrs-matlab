@@ -72,6 +72,32 @@ classdef UTestMgrs < matlab.unittest.TestCase
             end
         end
 
+        function testUtmStringToLatLon(testCase)
+            testData = testCase.testCoordinates;
+            utmStrings = [testData.utm];
+
+            [latitude_deg, longitude_deg] = mgrs.utmStringToLatLon(utmStrings);
+            [expectedLatitude_deg, expectedLongitude_deg] = mgrs.UTM.fromString(utmStrings).toLatLon();
+
+            testCase.verifyEqual(latitude_deg, expectedLatitude_deg, ...
+                'mgrs.utmStringToLatLon did not return the expected latitude values.');
+            testCase.verifyEqual(longitude_deg, expectedLongitude_deg, ...
+                'mgrs.utmStringToLatLon did not return the expected longitude values.');
+        end
+
+        function testMgrsStringToLatLon(testCase)
+            testData = testCase.testCoordinates;
+            mgrsStrings = [testData.mgrs];
+
+            [latitude_deg, longitude_deg] = mgrs.mgrsStringToLatLon(mgrsStrings);
+            [expectedLatitude_deg, expectedLongitude_deg] = mgrs.MGRS.fromString(mgrsStrings).toLatLon();
+
+            testCase.verifyEqual(latitude_deg, expectedLatitude_deg, ...
+                'mgrs.mgrsStringToLatLon did not return the expected latitude values.');
+            testCase.verifyEqual(longitude_deg, expectedLongitude_deg, ...
+                'mgrs.mgrsStringToLatLon did not return the expected longitude values.');
+        end
+
         function testUtmCoordinatesContainLatLon(testCase)
             testData = testCase.testCoordinates;
             testLatitudes_deg = [testData.lat]';

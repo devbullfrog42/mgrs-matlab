@@ -184,7 +184,7 @@ classdef MGRS < mgrs.UTM
         function obj = fromString(mgrsString)
 
             arguments
-                mgrsString string {mustBeMgrsString}
+                mgrsString string {mgrs.internal.mustBeMgrsString}
             end
 
             if coder.target("MATLAB")
@@ -208,20 +208,6 @@ classdef MGRS < mgrs.UTM
 
     end
 
-end
-
-function mustBeMgrsString(mgrsString)
-    bool = ~mgrs.isMgrsString(mgrsString);
-    if any(bool)
-        [badr, badc] = ind2sub(size(bool), find(bool));
-        badList = string();
-        for ii = 1:numel(badr)
-            badList = badList + sprintf("    %s at subscript (%d,%d)", mgrsString(badr(ii),badc(ii)), badr(ii), badc(ii)) + newline;
-        end
-        error( 'MGRS:invalidMgrsStrings', ...
-            'The following MGRS strings are invalid...\n%s', ...
-            badList )
-    end
 end
 
 function mustBeMgrsScalarOrSameSize(utmA, utmB)
