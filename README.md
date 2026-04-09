@@ -91,10 +91,10 @@ savepath;
 
 ## Testing
 
-The repository includes `UTestMgrs.m`, a MATLAB unit test class covering example conversions and format validation. Run tests using:
+The repository includes `TestMgrs.m`, a MATLAB unit test class covering example conversions and format validation. Run tests using:
 
 ```matlab
-runtests('UTestMgrs')
+runtests('TestMgrs')
 ```
 
 ## Notes

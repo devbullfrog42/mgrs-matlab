@@ -1,4 +1,4 @@
-classdef UTestMgrs < matlab.unittest.TestCase
+classdef TestMgrs < matlab.unittest.TestCase
 
     properties (Constant)
 
